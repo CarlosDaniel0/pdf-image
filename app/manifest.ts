@@ -24,7 +24,7 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     orientation: "portrait",
     share_target: {
-      action: "/receiver/",
+      action: "/share",
       method: "POST",
       enctype: "multipart/form-data",
       params: {
