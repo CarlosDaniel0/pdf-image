@@ -12,4 +12,5 @@ export const { dynamic, dynamicParams, revalidate, generateStaticParams, GET } =
     ],
     swSrc: "app/sw.ts",
     nextConfig: {},
+    useNativeEsbuild: true,
   });
