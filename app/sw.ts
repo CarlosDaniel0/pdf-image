@@ -33,7 +33,6 @@ const serwist = new Serwist({
 serwist.registerRoute(
   new RegExpRoute(/^\/share\/.*/, new NetworkFirst(), "POST"),
 );
-serwist.addEventListeners();
 
 serwist.setDefaultHandler(async ({ request, url }) => {
   try {
@@ -41,13 +40,18 @@ serwist.setDefaultHandler(async ({ request, url }) => {
       const formData = await request.formData();
       const pdf = formData.get("pdf");
       const mediaCache = await caches.open("others");
+      console.log(formData)
+      console.log(pdf)
       await mediaCache.put("pdf", new Response(pdf));
       const params = new URLSearchParams({
         n: pdf instanceof File ? pdf.name : `arquivo.pdf`,
         shared: "true",
       });
+
       return Response.redirect(`/?${params}`, 303);
     }
   } catch (e) {}
   return fetch(request);
 }, "POST");
+
+serwist.addEventListeners();
