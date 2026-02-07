@@ -25,6 +25,7 @@ export default function Home() {
       const url = new URL(window.location.href);
       const filename = url.searchParams.get("n") ?? "arquivo.pdf";
       const file = new File([blob], filename, { type: blob.type });
+      if (!file.size) return
       setFile(file);
     }
   };
