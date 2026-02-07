@@ -40,10 +40,13 @@ serwist.setDefaultHandler(async ({ request, url }) => {
     if (url.pathname === "/share" && request.method === "POST") {
       const formData = await request.formData();
       const pdf = formData.get("pdf");
+      console.log(pdf)
       const keys = await caches.keys();
       const mediaCache = await caches.open(
         keys.filter((key) => key.startsWith("media"))[0],
       );
+      console.log(keys)
+      console.log(mediaCache)
       await mediaCache.put("pdf", new Response(pdf));
       const params = new URLSearchParams({
         n: pdf instanceof File ? pdf.name : `arquivo.pdf`,
