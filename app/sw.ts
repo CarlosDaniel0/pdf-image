@@ -55,19 +55,23 @@ serwist.registerRoute(
   new RegExpRoute(/^\/share\/.*/, new NetworkFirst(), "POST"),
 );
 
+async function fileToBase64(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result + '');
+    reader.onerror = error => reject(error);
+    reader.readAsDataURL(file); 
+  });
+}
+
 serwist.setDefaultHandler(async ({ request, url }) => {
   try {
     if (url.pathname === "/share" && request.method === "POST") {
       const formData = await request.formData();
-      const pdf = formData.get("pdf");
-      const mediaCache = await caches.open("media");
-      await mediaCache.put("pdf", new Response(pdf));
-      const params = new URLSearchParams({
-        n: pdf instanceof File ? pdf.name : `arquivo.pdf`,
-        shared: "true",
-      });
-
-      return Response.redirect(`/?${params}`, 303);
+      const pdf = formData.get("pdf") as File;
+      const base64 = await fileToBase64(pdf)
+      localStorage.setItem('pdf', JSON.stringify({ name: pdf.name, size: pdf.size, content: base64 }));
+      return Response.redirect(`/`, 303);
     }
   } catch (e) {}
   return fetch(request);

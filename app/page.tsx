@@ -9,20 +9,21 @@ const PDFRender = dynamic(() => import("../components/PDFRender"), {
   loading: () => <Loading />,
 });
 
+interface ExternalFile {
+  size: number,
+  name: string,
+  content: string
+}
+
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
-
   const getShareFile = async () => {
-    console.log("chegou no event listener");
-    const mediaCache = await caches.open("media");;
-    const keys = await mediaCache.keys()
-    const pdf = keys.find(req => req.url.includes('pdf'))
-    console.log(pdf);
-    if (pdf) {
-      const blob = await pdf.blob();
-      await mediaCache.delete("pdf");
-      const url = new URL(window.location.href);
-      const filename = url.searchParams.get("n") ?? "arquivo.pdf";
+    const content = localStorage.getItem('pdf')
+    if (content) {
+      const pdf:  ExternalFile = JSON.parse(content) 
+      const blob = await fetch(pdf.content).then(res => res.blob());
+      localStorage.removeItem('pdf')
+      const filename = pdf.name
       const file = new File([blob], filename, { type: blob.type });
       if (!file.size) return
       setFile(file);
