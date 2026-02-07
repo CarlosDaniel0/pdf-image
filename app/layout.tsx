@@ -5,7 +5,7 @@ import { SerwistProvider } from "./serwist";
 
 const APP_NAME = "PDF";
 const APP_DEFAULT_TITLE = "Conversor PDF";
-const APP_TITLE_TEMPLATE = "%s - PDF";
+const APP_TITLE_TEMPLATE = "% PDF";
 const APP_DESCRIPTION = "Conversor PDF para imagens";
 
 export const metadata: Metadata = {
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FFFFFF",
+  themeColor: "#2b2b2b",
 };
 
 const geistSans = Geist({
