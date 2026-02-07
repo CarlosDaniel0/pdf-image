@@ -18,7 +18,6 @@ const serwist = new Serwist({
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: defaultCache,
-  
   fallbacks: {
     entries: [
       {
@@ -50,7 +49,7 @@ self.addEventListener("fetch", (evt) => {
             shared: "true",
             n: pdf instanceof File ? pdf.name : `arquivo.pdf`,
           });
-          return Response.redirect(`/conversor/png${params}`, 303);
+          return Response.redirect(`/conversor/png?${params}`, 303);
         } catch {
           return Response.redirect("/", 303);
         }
