@@ -55,15 +55,6 @@ serwist.registerRoute(
   new RegExpRoute(/^\/share\/.*/, new NetworkFirst(), "POST"),
 );
 
-async function fileToBase64(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result + "");
-    reader.onerror = (error) => reject(error);
-    reader.readAsDataURL(file);
-  });
-}
-
 let pdf: File | null = null
 serwist.setDefaultHandler(async ({ request, url }) => {
   try {
