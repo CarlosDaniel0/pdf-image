@@ -69,14 +69,9 @@ serwist.setDefaultHandler(async ({ request, url }) => {
     if (url.pathname === "/share" && request.method === "POST") {
       const formData = await request.formData();
       const pdf = formData.get("pdf") as File;
-      console.log(pdf);
       const base64 = await fileToBase64(pdf);
-      console.log(base64);
-      localStorage.setItem(
-        "pdf",
-        JSON.stringify({ name: pdf.name, size: pdf.size, content: base64 }),
-      );
-      return Response.redirect(`/?share=true`, 303);
+      const params = new URLSearchParams({ pdf: btoa(JSON.stringify({ content: base64, name: pdf.name, size: pdf.size + '' })) })
+      return Response.redirect(`/?${params}`, 303);
     }
   } catch (e) {
     console.log(e instanceof Error ? e.message : "");

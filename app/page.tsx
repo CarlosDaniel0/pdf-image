@@ -18,9 +18,10 @@ interface ExternalFile {
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const getShareFile = async () => {
-    const content = localStorage.getItem('pdf')
+    const url = new URL(window.location.href);
+    const content = url.searchParams.get('pdf')
     if (content) {
-      const pdf:  ExternalFile = JSON.parse(content) 
+      const pdf:  ExternalFile = JSON.parse(atob(content)) 
       const blob = await fetch(pdf.content).then(res => res.blob());
       localStorage.removeItem('pdf')
       const filename = pdf.name
