@@ -2,7 +2,7 @@
 /// <reference lib="webworker" />
 import { defaultCache } from "@serwist/turbopack/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
-import { Serwist } from "serwist";
+import { NetworkFirst, RegExpRoute, Serwist } from "serwist";
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -18,6 +18,7 @@ const serwist = new Serwist({
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: defaultCache,
+  
   fallbacks: {
     entries: [
       {
@@ -29,6 +30,9 @@ const serwist = new Serwist({
     ],
   },
 });
+
+serwist.registerRoute(new RegExpRoute(/^\/share\/.*/, new NetworkFirst(), "POST"));
+serwist.addEventListeners();
 
 self.addEventListener("fetch", (evt) => {
   if (evt.request.url.endsWith("/share") && evt.request.method === "POST") {
@@ -46,7 +50,7 @@ self.addEventListener("fetch", (evt) => {
             shared: "true",
             n: pdf instanceof File ? pdf.name : `arquivo.pdf`,
           });
-          return Response.redirect(`./conversor/png${params}`, 303);
+          return Response.redirect(`/conversor/png${params}`, 303);
         } catch {
           return Response.redirect("/", 303);
         }
@@ -55,4 +59,4 @@ self.addEventListener("fetch", (evt) => {
   }
 });
 
-serwist.addEventListeners();
+
