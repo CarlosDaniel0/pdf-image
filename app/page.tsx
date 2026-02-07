@@ -9,11 +9,6 @@ const PDFRender = dynamic(() => import("../components/PDFRender"), {
   loading: () => <Loading />,
 });
 
-interface ExternalFile {
-  size: number,
-  name: string,
-  content: string
-}
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -21,9 +16,10 @@ export default function Home() {
     const url = new URL(window.location.href);
     const content = url.searchParams.get('pdf')
     if (content) {
-      const pdf:  ExternalFile = JSON.parse(atob(content)) 
-      const blob = await fetch(pdf.content).then(res => res.blob());
-      const filename = pdf.name
+      const blob =  await fetch(`${url.origin}/pdf`).then(res => res.blob()).catch(() => null);
+      console.log(blob)
+      if (!blob) return
+      const filename = url.searchParams.get('pdf') ?? 'arquivo.pdf'
       const file = new File([blob], filename, { type: blob.type });
       if (!file.size) return
       setFile(file);

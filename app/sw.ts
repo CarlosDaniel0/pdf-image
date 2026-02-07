@@ -64,14 +64,20 @@ async function fileToBase64(file: File) {
   });
 }
 
+let pdf: File | null = null
 serwist.setDefaultHandler(async ({ request, url }) => {
   try {
     if (url.pathname === "/share" && request.method === "POST") {
       const formData = await request.formData();
-      const pdf = formData.get("pdf") as File;
-      const base64 = await fileToBase64(pdf);
-      const params = new URLSearchParams({ pdf: btoa(JSON.stringify({ content: base64, name: pdf.name, size: pdf.size + '' })) })
-      return Response.redirect(`/?${params}`, 303);
+      pdf = formData.get("pdf") as File;
+      const params = new URLSearchParams({ pdf: pdf.name })
+      return Response.redirect(`/${params}`, 303);
+    }
+    if (url.pathname === '/pdf' && request.method === 'POST') {
+      console.log(request)
+      console.log(pdf)
+      setTimeout(() => pdf = null, 2 * 60 * 1000)
+      return new Response(pdf);
     }
   } catch (e) {
     console.log(e instanceof Error ? e.message : "");
