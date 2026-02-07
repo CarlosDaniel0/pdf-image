@@ -30,32 +30,53 @@ const serwist = new Serwist({
   },
 });
 
-serwist.registerRoute(new RegExpRoute(/^\/share\/.*/, new NetworkFirst(), "POST"));
+serwist.registerRoute(
+  new RegExpRoute(/^\/share\/.*/, new NetworkFirst(), "POST"),
+);
 serwist.addEventListeners();
 
-self.addEventListener("fetch", (evt) => {
-  if (evt.request.url.endsWith("/share") && evt.request.method === "POST") {
-    return evt.respondWith(
-      (async () => {
-        try {
-          const formData = await evt.request.formData();
-          const pdf = formData.get("pdf");
-          const keys = await caches.keys();
-          const mediaCache = await caches.open(
-            keys.filter((key) => key.startsWith("media"))[0],
-          );
-          await mediaCache.put("pdf", new Response(pdf));
-          const params = new URLSearchParams({
-            shared: "true",
-            n: pdf instanceof File ? pdf.name : `arquivo.pdf`,
-          });
-          return Response.redirect(`/conversor/png?${params}`, 303);
-        } catch {
-          return Response.redirect("/", 303);
-        }
-      })(),
-    );
+serwist.setCatchHandler(async ({ request }) => {
+  console.log("error");
+  console.log(request);
+  const dest = request.destination;
+
+  if (dest === "document") {
+    const match = await serwist.matchPrecache("/offline.html");
+    return match || Response.error();
   }
+
+  if (dest === "image") {
+    const match = await serwist.matchPrecache("/fallback.png");
+    return match || Response.error();
+  }
+
+  if (dest === "font") {
+    const match = await serwist.matchPrecache("/fonts/fallback.woff2");
+    return match || Response.error();
+  }
+
+  return Response.error();
 });
 
-
+serwist.setDefaultHandler(async ({ request, url }) => {
+  try {
+    if (url.pathname === "/share" && request.method === "POST") {
+      const formData = await request.formData();
+      const pdf = formData.get("pdf");
+      const keys = await caches.keys();
+      console.log(pdf);
+      const mediaCache = await caches.open(
+        keys.filter((key) => key.startsWith("media"))[0],
+      );
+      await mediaCache.put("pdf", new Response(pdf));
+      const params = new URLSearchParams({
+        n: pdf instanceof File ? pdf.name : `arquivo.pdf`,
+        shared: "true",
+      });
+      return Response.redirect(`./?${params}`, 303);
+    }
+  } catch (e) { 
+    console.log(e instanceof Error ? e.message : '')
+   }
+  return fetch(request);
+}, "POST");

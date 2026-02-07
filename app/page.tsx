@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import ButtonFile from "../components/ButtonFile";
 import dynamic from "next/dynamic";
 import Loading from "@/components/Loading";
@@ -11,6 +11,26 @@ const PDFRender = dynamic(() => import("../components/PDFRender"), {
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    window.addEventListener("load", async () => {
+      console.log('chegou no event listener')
+      const keys = await caches.keys();
+      const mediaCache = await caches.open(
+        keys.filter((key) => key.startsWith("media"))[0],
+      );
+      const pdf = await mediaCache.match("pdf");
+      console.log(pdf)
+      if (pdf) {
+        const blob = await pdf.blob();
+        await mediaCache.delete("pdf");
+        const url = new URL(window.location.href);
+        const filename = url.searchParams.get("n") ?? "arquivo.pdf";
+        const file = new File([blob], filename, { type: blob.type });
+        setFile(file);
+      }
+    });
+  }, []);
 
   const handleChange = async (files: File[]) => {
     if (!files.length) return;
