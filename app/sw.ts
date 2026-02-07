@@ -43,7 +43,7 @@ serwist.setDefaultHandler(async ({ request, url }) => {
       console.log(pdf)
       const keys = await caches.keys();
       const mediaCache = await caches.open(
-        keys.filter((key) => key.startsWith("media"))[0],
+        keys.filter((key) => key.startsWith("others"))[0],
       );
       console.log(keys)
       console.log(mediaCache)
