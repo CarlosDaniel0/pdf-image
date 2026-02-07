@@ -18,6 +18,8 @@ export default function Home() {
     const mediaCache = await caches.open(
       keys.filter((key) => key.startsWith("media"))[0],
     );
+    console.log(keys)
+    console.log(mediaCache)
     const pdf = await mediaCache.match("pdf");
     console.log(pdf);
     if (pdf) {
