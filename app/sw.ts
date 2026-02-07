@@ -73,7 +73,7 @@ serwist.setDefaultHandler(async ({ request, url }) => {
         n: pdf instanceof File ? pdf.name : `arquivo.pdf`,
         shared: "true",
       });
-      return Response.redirect(`./?${params}`, 303);
+      return Response.redirect(`/?${params}`, 303);
     }
   } catch (e) { 
     console.log(e instanceof Error ? e.message : '')
