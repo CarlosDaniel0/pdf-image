@@ -12,24 +12,26 @@ const PDFRender = dynamic(() => import("../components/PDFRender"), {
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
 
+  const getShareFile = async () => {
+    console.log("chegou no event listener");
+    const keys = await caches.keys();
+    const mediaCache = await caches.open(
+      keys.filter((key) => key.startsWith("media"))[0],
+    );
+    const pdf = await mediaCache.match("pdf");
+    console.log(pdf);
+    if (pdf) {
+      const blob = await pdf.blob();
+      await mediaCache.delete("pdf");
+      const url = new URL(window.location.href);
+      const filename = url.searchParams.get("n") ?? "arquivo.pdf";
+      const file = new File([blob], filename, { type: blob.type });
+      setFile(file);
+    }
+  };
+
   useEffect(() => {
-    window.addEventListener("load", async () => {
-      console.log('chegou no event listener')
-      const keys = await caches.keys();
-      const mediaCache = await caches.open(
-        keys.filter((key) => key.startsWith("media"))[0],
-      );
-      const pdf = await mediaCache.match("pdf");
-      console.log(pdf)
-      if (pdf) {
-        const blob = await pdf.blob();
-        await mediaCache.delete("pdf");
-        const url = new URL(window.location.href);
-        const filename = url.searchParams.get("n") ?? "arquivo.pdf";
-        const file = new File([blob], filename, { type: blob.type });
-        setFile(file);
-      }
-    });
+    getShareFile();
   }, []);
 
   const handleChange = async (files: File[]) => {

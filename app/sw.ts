@@ -35,36 +35,12 @@ serwist.registerRoute(
 );
 serwist.addEventListeners();
 
-serwist.setCatchHandler(async ({ request }) => {
-  console.log("error");
-  console.log(request);
-  const dest = request.destination;
-
-  if (dest === "document") {
-    const match = await serwist.matchPrecache("/offline.html");
-    return match || Response.error();
-  }
-
-  if (dest === "image") {
-    const match = await serwist.matchPrecache("/fallback.png");
-    return match || Response.error();
-  }
-
-  if (dest === "font") {
-    const match = await serwist.matchPrecache("/fonts/fallback.woff2");
-    return match || Response.error();
-  }
-
-  return Response.error();
-});
-
 serwist.setDefaultHandler(async ({ request, url }) => {
   try {
     if (url.pathname === "/share" && request.method === "POST") {
       const formData = await request.formData();
       const pdf = formData.get("pdf");
       const keys = await caches.keys();
-      console.log(pdf);
       const mediaCache = await caches.open(
         keys.filter((key) => key.startsWith("media"))[0],
       );
@@ -75,8 +51,6 @@ serwist.setDefaultHandler(async ({ request, url }) => {
       });
       return Response.redirect(`/?${params}`, 303);
     }
-  } catch (e) { 
-    console.log(e instanceof Error ? e.message : '')
-   }
+  } catch (e) {}
   return fetch(request);
 }, "POST");
