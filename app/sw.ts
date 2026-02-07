@@ -62,8 +62,7 @@ serwist.setDefaultHandler(async ({ request, url }) => {
     if (url.pathname === "/share" && request.method === "POST") {
       const formData = await request.formData();
       pdf = formData.get("pdf") as File;
-      const params = new URLSearchParams({ pdf: pdf.name })
-      return Response.redirect(`/?${params}`, 303);
+      return Response.redirect(`/`, 303);
     }
   } catch (e) {
     console.log(e instanceof Error ? e.message : "");
@@ -75,7 +74,7 @@ serwist.setDefaultHandler(async ({ request, url }) => {
 channel.addEventListener('message', (evt) => {
   const message = evt.data
   if (message === 'pdf') {
-    console.log(pdf)
+    setTimeout(() => pdf = null, 2 * 60 * 1000)
     return channel.postMessage(pdf)
   }
 })

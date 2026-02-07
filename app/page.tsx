@@ -13,7 +13,6 @@ const channel = new BroadcastChannel("share");
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const getShareFile = () => {
-    
     channel.addEventListener("message", async (evt) => {
       const { data } = evt;
       const pdf: File = data;
@@ -34,6 +33,7 @@ export default function Home() {
     if (!files.length) return;
     const f = files[0];
     setFile(f);
+    window.history.replaceState({ pdf: true }, '', '');
   };
 
   return (
