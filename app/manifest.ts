@@ -3,7 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Conversor PDF",
-    short_name: "Conversor PDF para imagens",
+    short_name: "Conversor PDF",
+    description: "Conversor de páginas PDF em imagem",
     icons: [
       {
         src: "/icons/web-app-manifest-192x192.png",
@@ -19,7 +20,7 @@ export default function manifest(): MetadataRoute.Manifest {
       },
     ],
     theme_color: "#2b2b2b",
-    background_color: "#2b2b2b",
+    background_color: "#ffffff",
     start_url: "/",
     display: "standalone",
     orientation: "portrait",
