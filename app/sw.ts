@@ -65,12 +65,6 @@ serwist.setDefaultHandler(async ({ request, url }) => {
       const params = new URLSearchParams({ pdf: pdf.name })
       return Response.redirect(`/?${params}`, 303);
     }
-    if (url.pathname === '/pdf' && request.method === 'POST') {
-      console.log(request)
-      console.log(pdf)
-      setTimeout(() => pdf = null, 2 * 60 * 1000)
-      return new Response(pdf);
-    }
   } catch (e) {
     console.log(e instanceof Error ? e.message : "");
     return Response.redirect(`/`, 303);
