@@ -56,6 +56,7 @@ serwist.registerRoute(
 );
 
 let pdf: File | null = null
+const channel = new BroadcastChannel('share');
 serwist.setDefaultHandler(async ({ request, url }) => {
   try {
     if (url.pathname === "/share" && request.method === "POST") {
@@ -76,5 +77,13 @@ serwist.setDefaultHandler(async ({ request, url }) => {
   }
   return fetch(request);
 }, "POST");
+
+channel.addEventListener('message', (evt) => {
+  const message = evt.data
+  if (message === 'pdf') {
+    console.log(pdf)
+    return channel.postMessage(pdf)
+  }
+})
 
 serwist.addEventListeners();

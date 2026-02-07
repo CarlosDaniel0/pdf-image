@@ -9,21 +9,21 @@ const PDFRender = dynamic(() => import("../components/PDFRender"), {
   loading: () => <Loading />,
 });
 
-
+const channel = new BroadcastChannel("share");
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
-  const getShareFile = async () => {
-    const url = new URL(window.location.href);
-    const content = url.searchParams.get('pdf')
-    if (content) {
-      const blob =  await fetch(`${url.origin}/pdf`).then(res => res.blob()).catch(() => null);
-      console.log(blob)
-      if (!blob) return
-      const filename = url.searchParams.get('pdf') ?? 'arquivo.pdf'
-      const file = new File([blob], filename, { type: blob.type });
-      if (!file.size) return
-      setFile(file);
-    }
+  const getShareFile = () => {
+    
+    channel.addEventListener("message", async (evt) => {
+      const { data } = evt;
+      const pdf: File = data;
+      if (pdf) {
+        if (!pdf.size) return;
+        setFile(pdf);
+      }
+    });
+
+    setTimeout(() => channel.postMessage("pdf"), 100)
   };
 
   useEffect(() => {
