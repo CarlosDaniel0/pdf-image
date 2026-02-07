@@ -2,7 +2,13 @@
 /// <reference lib="webworker" />
 import { defaultCache } from "@serwist/turbopack/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
-import { NetworkFirst, RegExpRoute, Serwist } from "serwist";
+import {
+  ExpirationPlugin,
+  NetworkFirst,
+  RegExpRoute,
+  Serwist,
+  StaleWhileRevalidate,
+} from "serwist";
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -17,7 +23,22 @@ const serwist = new Serwist({
   skipWaiting: true,
   clientsClaim: true,
   navigationPreload: true,
-  runtimeCaching: defaultCache,
+  runtimeCaching: [
+    ...defaultCache,
+    {
+      matcher: /\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,
+      handler: new StaleWhileRevalidate({
+        cacheName: "media",
+        plugins: [
+          new ExpirationPlugin({
+            maxEntries: 64,
+            maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+            maxAgeFrom: "last-used",
+          }),
+        ],
+      }),
+    },
+  ],
   fallbacks: {
     entries: [
       {
@@ -39,9 +60,7 @@ serwist.setDefaultHandler(async ({ request, url }) => {
     if (url.pathname === "/share" && request.method === "POST") {
       const formData = await request.formData();
       const pdf = formData.get("pdf");
-      const mediaCache = await caches.open("others");
-      console.log(formData)
-      console.log(pdf)
+      const mediaCache = await caches.open("media");
       await mediaCache.put("pdf", new Response(pdf));
       const params = new URLSearchParams({
         n: pdf instanceof File ? pdf.name : `arquivo.pdf`,
