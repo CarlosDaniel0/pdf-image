@@ -80,6 +80,7 @@ serwist.setDefaultHandler(async ({ request, url }) => {
     }
   } catch (e) {
     console.log(e instanceof Error ? e.message : "");
+    return Response.redirect(`/`, 303);
   }
   return fetch(request);
 }, "POST");
