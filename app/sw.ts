@@ -62,7 +62,7 @@ serwist.setDefaultHandler(async ({ request, url }) => {
       const formData = await request.formData();
       pdf = formData.get("pdf") as File;
       const params = new URLSearchParams({ pdf: pdf.name })
-      return Response.redirect(`/${params}`, 303);
+      return Response.redirect(`/?${params}`, 303);
     }
     if (url.pathname === '/pdf' && request.method === 'POST') {
       console.log(request)
