@@ -14,14 +14,11 @@ export default function Home() {
 
   const getShareFile = async () => {
     console.log("chegou no event listener");
-    const keys = await caches.keys();
-    const mediaCache = await caches.open(
-      keys.filter((key) => key.startsWith("others"))[0],
-    );
-    console.log(keys)
-    console.log(mediaCache)
-    const pdf = await mediaCache.match("pdf");
+    const mediaCache = await caches.open("others");;
+    const keys = await mediaCache.keys()
+    const pdf = keys.find(req => req.url.includes('pdf'))
     console.log(pdf);
+
     if (pdf) {
       const blob = await pdf.blob();
       await mediaCache.delete("pdf");
