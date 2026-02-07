@@ -23,7 +23,6 @@ export default function Home() {
     if (content) {
       const pdf:  ExternalFile = JSON.parse(atob(content)) 
       const blob = await fetch(pdf.content).then(res => res.blob());
-      localStorage.removeItem('pdf')
       const filename = pdf.name
       const file = new File([blob], filename, { type: blob.type });
       if (!file.size) return
