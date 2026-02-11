@@ -4,7 +4,7 @@ export const Backdrop = styled.div<{
   $blur?: boolean;
   $zIndex?: number | string;
 }>`
-  position: absolute;
+  position: fixed;
   top: 0px;
   left: 0px;
   right: 0px;

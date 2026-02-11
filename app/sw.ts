@@ -74,8 +74,8 @@ serwist.setDefaultHandler(async ({ request, url }) => {
 channel.addEventListener('message', (evt) => {
   const message = evt.data
   if (message === 'pdf') {
-    setTimeout(() => pdf = null, 2 * 60 * 1000)
-    return channel.postMessage(pdf)
+    channel.postMessage(pdf)
+    pdf = null
   }
 })
 

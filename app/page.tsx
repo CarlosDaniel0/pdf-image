@@ -4,6 +4,7 @@ import ButtonFile from "../components/ButtonFile";
 import dynamic from "next/dynamic";
 import Loading from "@/components/Loading";
 import Footer from "@/components/Footer";
+import SnackBar from "@/components/SnackBar";
 
 const PDFRender = dynamic(() => import("../components/PDFRender"), {
   ssr: false,
@@ -13,6 +14,7 @@ const PDFRender = dynamic(() => import("../components/PDFRender"), {
 const channel = new BroadcastChannel("share");
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
+  const [controller, setController] = useState({ error: "", show: false });
   const getShareFile = () => {
     channel.addEventListener("message", async (evt) => {
       const { data } = evt;
@@ -37,6 +39,11 @@ export default function Home() {
     window.history.replaceState({ pdf: true }, "", "");
   };
 
+  const handleError = (err: Error) => {
+    setFile(null);
+    setController({ show: true, error: err?.message })
+  };
+
   return (
     <main
       className={
@@ -45,7 +52,7 @@ export default function Home() {
     >
       {file ? (
         <Suspense fallback={<p>Loading PDF...</p>}>
-          <PDFRender file={file} />
+          <PDFRender file={file} onError={handleError} />
         </Suspense>
       ) : (
         <>
@@ -58,6 +65,7 @@ export default function Home() {
             <ButtonFile accept="application/pdf" onChange={handleChange} />
           </div>
           <Footer />
+          <SnackBar type="error" show={controller.show} setShow={(show) => setController(prev => ({ ...prev, show }) as never)} message={controller.error} />
         </>
       )}
     </main>

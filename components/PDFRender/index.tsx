@@ -24,7 +24,7 @@ const stylesModal = css`
 `;
 
 const salt = (Math.random() * 10000).toString(16);
-export default function PDFRender({ url, file }: PDFViewerProps) {
+export default function PDFRender({ url, file, onError }: PDFViewerProps) {
   const mutex = useRef(0);
   const [page, setPage] = useState<PDFPageProxy | null>(null);
   const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null);
@@ -38,6 +38,7 @@ export default function PDFRender({ url, file }: PDFViewerProps) {
     data: "",
     width: 0,
     height: 0,
+    offset: [0, 0] as [number, number],
   });
   const [controller, setController] = useState({
     page: 0,
@@ -97,11 +98,12 @@ export default function PDFRender({ url, file }: PDFViewerProps) {
       y += page.canvas.height;
     }
     ctx.scale(dpr, dpr);
-    const pixel = await getSignificativePixel(page);
+    const [sPixel, ePixel] = await getSignificativePixel(page);
     setImage({
       data: page.toDataURL("image/png"),
+      offset: [0, sPixel.y],
       width: page.width,
-      height: page.height - pixel.y,
+      height: page.height - sPixel.y - ePixel.y,
     });
     page.remove();
   };
@@ -109,7 +111,9 @@ export default function PDFRender({ url, file }: PDFViewerProps) {
   useEffect(() => {
     if (mutex.current) return;
     mutex.current = 1;
-    loadPDF({ url, file }).finally(() => (mutex.current = 0));
+    loadPDF({ url, file })
+    .catch(err => onError(err))
+    .finally(() => (mutex.current = 0));
   }, [url]);
 
   const share = async (file: File) => {
@@ -128,7 +132,7 @@ export default function PDFRender({ url, file }: PDFViewerProps) {
   const sharePDF = async () => {
     const file = await generatePDF({
       name: `${name}_cropped.pdf`,
-      img: cropImage(img.current!, image.width, image.height),
+      img: cropImage(img.current!, image.width, image.height, image.offset),
       width: image.width,
       height: image.height,
       type: "file",
@@ -146,12 +150,12 @@ export default function PDFRender({ url, file }: PDFViewerProps) {
     if (!img.current) return;
     generatePDF({
       name: `${name}_cropped.pdf`,
-      img: cropImage(img.current!, image.width, image.height),
+      img: cropImage(img.current!, image.width, image.height, image.offset),
       width: image.width,
       height: image.height,
       type: "download",
     });
-    setModal({ show: false, type: '' })
+    setModal({ show: false, type: "" });
   };
 
   const downloadPNG = () => {
@@ -160,13 +164,13 @@ export default function PDFRender({ url, file }: PDFViewerProps) {
     a.href = image.data;
     a.click();
     a.remove();
-    setModal({ show: false, type: '' })
+    setModal({ show: false, type: "" });
   };
 
   const shareOptions = (type: "share" | "download") => [
     {
       style: {
-        background: "#c10202",
+        background: "#c51d1d",
       } as React.CSSProperties,
       label: (
         <div className="flex justify-center items-center gap-2 px-4 py-2">
@@ -177,7 +181,7 @@ export default function PDFRender({ url, file }: PDFViewerProps) {
     },
     {
       style: {
-        background: "#103ab7",
+        background: "#147dc7",
       } as React.CSSProperties,
       label: (
         <div className="flex justify-center items-center gap-2 px-4 py-2">
@@ -236,7 +240,7 @@ export default function PDFRender({ url, file }: PDFViewerProps) {
               <button
                 key={`BS${salt}${i}`}
                 style={option.style}
-                className="rounded-xl text-xl px-4 py-2 shadow-lg"
+                className="rounded-xl text-xl px-4 py-2 shadow-lg active:scale-95"
                 onClick={option.onClick}
               >
                 {option.label}

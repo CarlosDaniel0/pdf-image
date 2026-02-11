@@ -6,5 +6,6 @@ export interface PDFPage extends PDFPageProxy {
 
 export interface PDFViewerProps {
   url?: string;
-  file?: File 
+  file?: File;
+  onError: (err: Error) => void
 }

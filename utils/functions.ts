@@ -16,24 +16,17 @@ export async function fileToArrayBuffer(file: File) {
   });
 }
 
-export async function getSignificativePixel(canvas: HTMLCanvasElement) {
-  const img: ImagePixel = {
-    width: 0,
-    height: 0,
+export function getPixel(
+  pixels: number[],
+  width: number,
+  height: number,
+) {
+  const pixel: ImagePixel = {
+    width,
+    height,
     x: -1,
     y: -1,
-  };
-  const context = canvas.getContext("2d");
-  if (!context) return img;
-  const { data, width, height } = context.getImageData(
-    0,
-    0,
-    canvas.width,
-    canvas.height,
-  );
-  img.height = height;
-  img.width = width;
-  const pixels = [...data].reverse();
+  }
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const index = (y * width + x) * 4;
@@ -44,20 +37,37 @@ export async function getSignificativePixel(canvas: HTMLCanvasElement) {
         pixels[index + 3],
       ];
       if (r !== 255 || g !== 255 || b !== 255) {
-        img.x = x;
-        img.y = y;
+        pixel.x = x;
+        pixel.y = y;
         break;
       }
     }
-    if (img.x !== -1 || img.y !== -1) break;
+    if (pixel.x !== -1 || pixel.y !== -1) break;
   }
-  return img;
+  return pixel
+}
+
+export async function getSignificativePixel(canvas: HTMLCanvasElement) {
+  const context = canvas.getContext("2d");
+  if (!context) return [];
+  const { data, width, height } = context.getImageData(
+    0,
+    0,
+    canvas.width,
+    canvas.height,
+  );
+  const imgs: ImagePixel[] = [
+    getPixel([...data], width, height),
+    getPixel([...data].reverse(), width, height)
+  ]
+  return imgs;
 }
 
 export function cropImage(
   image: HTMLImageElement,
   width: number,
   height: number,
+  offset: [number, number]
 ) {
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -69,12 +79,15 @@ export function cropImage(
   canvas.style.height = "0px";
   document.body.append(canvas);
   const ctx = canvas.getContext("2d");
-  ctx?.drawImage(image, 0, 0, width, height, 0, 0, width, height);
+  const [x, y] = offset
+  ctx?.drawImage(image, x, y, width, height, 0, 0, width, height);
   setTimeout(() => canvas.remove(), 300);
   return canvas.toDataURL("image/png");
 }
 
-export async function generatePDF<T extends "blob" | "download" | "file">(props: {
+export async function generatePDF<
+  T extends "blob" | "download" | "file",
+>(props: {
   name: string;
   img: string;
   width: number;
@@ -96,11 +109,12 @@ export async function generatePDF<T extends "blob" | "download" | "file">(props:
   const py = 1;
   doc.addImage(img, "PNG", px, py, pdfWidth, pdfHeight);
   switch (type) {
-    case 'download': return doc.save(name) as PDFGenerated<T>;
-    case 'blob':
-    case 'file':
-      const blob = doc.output("blob") 
-      if (type === 'blob') return blob as PDFGenerated<T>; 
-      return new File([blob], name, { type: blob.type }) as PDFGenerated<T>
+    case "download":
+      return doc.save(name) as PDFGenerated<T>;
+    case "blob":
+    case "file":
+      const blob = doc.output("blob");
+      if (type === "blob") return blob as PDFGenerated<T>;
+      return new File([blob], name, { type: blob.type }) as PDFGenerated<T>;
   }
 }

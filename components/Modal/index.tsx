@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react"
 import { type IModalProps } from "./types"
 import { Backdrop, PanelBottom } from "./styles"
+import { Timeout } from "@/utils/types"
 
 const Modal = (props: IModalProps) => {
   const { children, show, backdrop, container, blur = true, zIndex, setShow, direction, ref } = props
   const { css, ...rest } = container ?? {}
-  const [controller, setController] = useState({ show: false, close: true, timer: null as null | NodeJS.Timeout })
+  const [controller, setController] = useState({ show: false, close: true, timer: null as null | Timeout })
 
   const toggle = () => {
     setController(prev => {
@@ -17,7 +18,7 @@ const Modal = (props: IModalProps) => {
     })
   }
 
-  const reset = (controller: { show: boolean, close: boolean, timer: null | NodeJS.Timeout }) => {
+  const reset = (controller: { show: boolean, close: boolean, timer: null | Timeout }) => {
     if (controller.timer) reset(controller)
     setShow?.(false)
     document.body.style.overflow = ''
