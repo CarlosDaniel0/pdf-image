@@ -3,6 +3,7 @@ import { Suspense, useEffect, useState } from "react";
 import ButtonFile from "../components/ButtonFile";
 import dynamic from "next/dynamic";
 import Loading from "@/components/Loading";
+import Footer from "@/components/Footer";
 
 const PDFRender = dynamic(() => import("../components/PDFRender"), {
   ssr: false,
@@ -22,7 +23,7 @@ export default function Home() {
       }
     });
 
-    setTimeout(() => channel.postMessage("pdf"), 100)
+    setTimeout(() => channel.postMessage("pdf"), 100);
   };
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export default function Home() {
     if (!files.length) return;
     const f = files[0];
     setFile(f);
-    window.history.replaceState({ pdf: true }, '', '');
+    window.history.replaceState({ pdf: true }, "", "");
   };
 
   return (
@@ -47,11 +48,17 @@ export default function Home() {
           <PDFRender file={file} />
         </Suspense>
       ) : (
-        <div className="bg-gray-700 flex flex-col text-center max-w-125 mx-3 py-8 px-5 rounded-xl gap-4 shadow-xs">
-          <h1 className="text-4xl">PDF para PNG</h1>
-          <p>Converta PDF em uma imagem PNG</p>
-          <ButtonFile onChange={handleChange} />
-        </div>
+        <>
+          <div
+            style={{ background: "#454545" }}
+            className="flex flex-col text-center max-w-125 mx-3 py-8 px-5 rounded-xl gap-4 shadow-xl/20"
+          >
+            <h1 className="text-4xl">Imagem do PDF</h1>
+            <p>Converta PDF em uma imagem PNG</p>
+            <ButtonFile accept="application/pdf" onChange={handleChange} />
+          </div>
+          <Footer />
+        </>
       )}
     </main>
   );
