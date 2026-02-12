@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { Suspense, useEffect, useState } from "react";
 import ButtonFile from "../components/ButtonFile";
@@ -5,6 +6,7 @@ import dynamic from "next/dynamic";
 import Loading from "@/components/Loading";
 import Footer from "@/components/Footer";
 import SnackBar from "@/components/SnackBar";
+import { useRouter } from "next/navigation";
 
 const PDFRender = dynamic(() => import("../components/PDFRender"), {
   ssr: false,
@@ -13,6 +15,7 @@ const PDFRender = dynamic(() => import("../components/PDFRender"), {
 
 const channel = new BroadcastChannel("share");
 export default function Home() {
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [controller, setController] = useState({ error: "", show: false });
   const getShareFile = () => {
@@ -29,6 +32,7 @@ export default function Home() {
   };
 
   useEffect(() => {
+    router.replace('/');
     getShareFile();
   }, []);
 
@@ -36,13 +40,23 @@ export default function Home() {
     if (!files.length) return;
     const f = files[0];
     setFile(f);
-    window.history.replaceState({ pdf: true }, "", "");
+    router.push('/?pdf=true')
   };
 
   const handleError = (err: Error) => {
     setFile(null);
     setController({ show: true, error: err?.message })
   };
+
+  const handlePopstate = () => {
+    setFile(null)
+    setController({ error: "", show: false })
+  }
+
+  useEffect(() => {
+    window.addEventListener('popstate', handlePopstate)
+    return () => window.removeEventListener('popstate', handlePopstate)
+  }, [])
 
   return (
     <main

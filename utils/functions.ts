@@ -95,19 +95,14 @@ export async function generatePDF<
   type: T;
 }): Promise<PDFGenerated<T>> {
   const { name, img, width, height, type } = props;
-  const doc = new jsPDF("p", "mm", "a4");
-  const [pgWidth, pgHeight] = [
-    doc.internal.pageSize.getWidth(),
-    doc.internal.pageSize.getHeight(),
-  ];
-  const imgWidth = width;
-  const imgHeight = height;
-  const ratio = imgHeight / imgWidth;
-  const pdfHeight = pgHeight - 2;
-  const pdfWidth = pgHeight / ratio;
-  const px = (pgWidth - pdfWidth) / 2;
+  const scale = 3.7
+  const ratio = height / width;
+  const [docWidth, docHeight] = [210*scale, 297*scale]
+  const [imgWidth, imgHeight] = [docHeight / ratio, docHeight - 2]
+  const doc = new jsPDF("p", "mm", [docWidth, docHeight]);
+  const px = (docWidth - imgWidth) / 2;
   const py = 1;
-  doc.addImage(img, "PNG", px, py, pdfWidth, pdfHeight);
+  doc.addImage(img, "PNG", px, py, imgWidth, imgHeight);
   switch (type) {
     case "download":
       return doc.save(name) as PDFGenerated<T>;
