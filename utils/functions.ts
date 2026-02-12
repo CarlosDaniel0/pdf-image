@@ -95,7 +95,7 @@ export async function generatePDF<
   type: T;
 }): Promise<PDFGenerated<T>> {
   const { name, img, width, height, type } = props;
-  const scale = 3.7
+  const scale = 1.5
   const ratio = height / width;
   const [docWidth, docHeight] = [210*scale, 297*scale]
   const [imgWidth, imgHeight] = [docHeight / ratio, docHeight - 2]
