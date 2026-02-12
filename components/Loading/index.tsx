@@ -1,7 +1,8 @@
-export default function Loading() {
+export default function Loading(props: { label?: string }) {
+  const { label } = props
   return (
     <div className="w-screen h-screen flex justify-center items-center">
-      <div role="status">
+      <div role="status" className="flex flex-col items-center gap-2">
         <svg
           aria-hidden="true"
           className="inline w-8 h-8 text-neutral-tertiary animate-spin fill-blue-400"
@@ -18,7 +19,7 @@ export default function Loading() {
             fill="currentFill"
           />
         </svg>
-        <span className="sr-only">Carregando...</span>
+        <span className={label ? 'whitespace-pre text-center' : "sr-only"}>{label ? label : 'Carregando...'}</span>
       </div>
     </div>
   );

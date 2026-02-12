@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Imagem do PDF",
-    short_name: "Imagem do PDF",
+    name: "Conversor PDF",
+    short_name: "Conversor PDF",
     icons: [
       {
         src: "/icons/web-app-manifest-192x192.png",

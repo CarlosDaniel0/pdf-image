@@ -3,10 +3,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SerwistProvider } from "./serwist";
 
-const APP_NAME = "Imagem do PDF";
-const APP_DEFAULT_TITLE = "Imagem do PDF";
+const APP_NAME = "Conversor PDF";
+const APP_DEFAULT_TITLE = "Conversor PDF";
 const APP_TITLE_TEMPLATE = "%s - PDF";
-const APP_DESCRIPTION = "Conversor de páginas do arquivo PDF para imagen";
+const APP_DESCRIPTION = "Converta de páginas de um arquivo PDF para única imagen";
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,

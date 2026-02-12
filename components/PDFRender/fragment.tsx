@@ -1,8 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { useEffect, useRef } from "react";
 import "pdfjs-dist/build/pdf.worker.min.mjs";
 import { PDFDocumentProxy } from "pdfjs-dist/types/src/display/api";
-import { PDFPageProxy } from "pdfjs-dist";
 import { PDFPage } from "./types";
 
 interface PDFViewerProps {

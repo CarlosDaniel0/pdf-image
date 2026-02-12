@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as pdfjs from "pdfjs-dist";
@@ -16,6 +17,8 @@ import {
 } from "@/utils/functions";
 import Modal from "../Modal";
 import { css } from "styled-components";
+import Image from "next/image";
+import Loading from "../Loading";
 
 const stylesModal = css`
   @media screen and (min-width: 500px) {
@@ -41,6 +44,7 @@ export default function PDFRender({ url, file, onError }: PDFViewerProps) {
     offset: [0, 0] as [number, number],
   });
   const [controller, setController] = useState({
+    loading: false,
     page: 0,
     pages: -1,
     images: [] as string[],
@@ -66,8 +70,9 @@ export default function PDFRender({ url, file, onError }: PDFViewerProps) {
     const pdf = await loadingTask.promise;
     setController({
       page: 1,
-      pages: pdf.numPages,
       images: [],
+      pages: pdf.numPages,
+      loading: true,
     });
     setPdf(pdf);
   };
@@ -93,7 +98,7 @@ export default function PDFRender({ url, file, onError }: PDFViewerProps) {
     const ctx = page.getContext("2d");
     if (!ctx) return;
     const dpr = window.devicePixelRatio || 1;
-    for (let page of pages) {
+    for (const page of pages) {
       ctx.drawImage(page.canvas, 0, y);
       y += page.canvas.height;
     }
@@ -106,14 +111,15 @@ export default function PDFRender({ url, file, onError }: PDFViewerProps) {
       height: page.height - sPixel.y - ePixel.y,
     });
     page.remove();
+    setController((prev) => ({ ...prev, loading: false }));
   };
 
   useEffect(() => {
     if (mutex.current) return;
     mutex.current = 1;
     loadPDF({ url, file })
-    .catch(err => onError(err))
-    .finally(() => (mutex.current = 0));
+      .catch((err) => onError(err))
+      .finally(() => (mutex.current = 0));
   }, [url]);
 
   const share = async (file: File) => {
@@ -199,7 +205,7 @@ export default function PDFRender({ url, file, onError }: PDFViewerProps) {
   };
 
   useEffect(() => {
-    if (pages.length !== pdf?.numPages) return;
+    if (pages.length !== Math.min(10, pdf?.numPages ?? 0)) return;
     handleShow(pages);
   }, [pages, pdf?.numPages]);
 
@@ -212,6 +218,15 @@ export default function PDFRender({ url, file, onError }: PDFViewerProps) {
 
   return (
     <div>
+      {controller.loading && (
+        <Loading
+          label={
+            pages.length !== Math.min(10, pdf?.numPages ?? 0)
+              ? `Páginas renderizadas\n${pages.length} de ${Math.min(10, pdf?.numPages ?? 0)}`
+              : "Aguarde..."
+          }
+        />
+      )}
       <Modal
         direction="from-bottom"
         show={modal.show}
@@ -251,7 +266,7 @@ export default function PDFRender({ url, file, onError }: PDFViewerProps) {
       <div className="absolute overflow-hidden w-0 h-0">
         <div className="z-[-1] opacity-0">
           {pdf &&
-            Array.from({ length: pdf.numPages }, (_, i) => (
+            Array.from({ length: Math.min(pdf.numPages, 10) }, (_, i) => (
               <PDFFragment
                 key={`PR${i}${salt}`}
                 pdf={pdf!}
@@ -263,7 +278,15 @@ export default function PDFRender({ url, file, onError }: PDFViewerProps) {
       </div>
       {image.data && (
         <>
-          <img ref={img} className="m-auto" alt={name} src={image.data} />
+          <Image
+            ref={img}
+            className="m-auto"
+            alt={name}
+            src={image.data}
+            width={0}
+            height={0}
+            style={{ width: "max-content", height: "auto" }}
+          />
           <div className="fixed bottom-6 left-0 right-0 flex justify-center gap-4">
             {!!navigator?.share && (
               <button
