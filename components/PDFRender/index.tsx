@@ -286,6 +286,7 @@ export default function PDFRender({ url, file, onError }: PDFViewerProps) {
             width={0}
             height={0}
             style={{ width: "max-content", height: "auto" }}
+            draggable="false"
           />
           <div className="fixed bottom-6 left-0 right-0 flex justify-center gap-4">
             {!!navigator?.share && (
