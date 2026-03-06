@@ -17,7 +17,7 @@ export default function PDFFragment({ page, pdf, onFinally }: PDFViewerProps) {
 
   const loadPage = async (pdf: PDFDocumentProxy, pg: number) => {
     const page = await pdf.getPage(pg)
-    const viewport = page.getViewport({ scale: 1 });
+    const viewport = page.getViewport({ scale: 4 });
     const canvas = canvasRef.current;
     if (!canvas) return;
     const context = canvas.getContext("2d");

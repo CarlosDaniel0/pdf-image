@@ -21,6 +21,7 @@ const Modal = (props: IModalProps) => {
   const reset = (controller: { show: boolean, close: boolean, timer: null | Timeout }) => {
     if (controller.timer) reset(controller)
     setShow?.(false)
+    // eslint-disable-next-line react-hooks/immutability
     document.body.style.overflow = ''
     return { close: true, timer: null, show: false }
   }

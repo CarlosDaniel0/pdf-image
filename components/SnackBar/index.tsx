@@ -63,6 +63,7 @@ export default function SnackBar(props: SnackBarProps) {
   useEffect(() => {
     if (!show) setController((prev) => ({ ...prev, close: true }));
     else toggle();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show]);
 
   return (
