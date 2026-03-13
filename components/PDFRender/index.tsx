@@ -216,16 +216,12 @@ export default function PDFRender({ url, file, onError }: PDFViewerProps) {
     loadPages(pdf, controller.page).finally(() => (mutex.current = 0));
   }, [page, controller.page]);
 
+  console.log(pages.length / Math.min(10, pdf?.numPages ?? 0))
   return (
     <div>
       {controller.loading && (
         <Loading
-          label={
-            pages.length !== Math.min(10, pdf?.numPages ?? 0)
-              ? `Páginas renderizadas\n${pages.length} de ${Math.min(10, pdf?.numPages ?? 0)}`
-              : "Aguarde..."
-          }
-        />
+        percent={pages.length / Math.min(10, pdf?.numPages ?? 0)} />
       )}
       <Modal
         direction="from-bottom"
