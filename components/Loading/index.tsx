@@ -25,17 +25,17 @@ export default function Loading(props: { label?: string; percent?: number }) {
             fill="none"
             d="M8.5 0.6 l2.75 2.4 l2.75 0 l0 3.3 l2.3 2.3 l-2.3 2.3 l0 3.1 l-3.1 0 l-2.4 2.4 l-2.4 -2.4 l-3.1 0 l0 -2.8 l-2.3 -2.6 l2.3 -2.8l0 -2.8l2.75 0z"
           >
-            <animate
+            {!percent && <animate
               attributeName="stroke-dashoffset"
               calcMode="spline"
               values="60;-60"
               dur="2s"
               keySplines="0 0 1 1"
               repeatCount="indefinite"
-            /> 
+            />}
           </path>
         </svg>
-        <span className="absolute top-[32%] text-sm">
+        <span className="absolute top-[50%] translate-y-[-50%] text-lg">
           {!!percent &&
             Intl.NumberFormat("pt-BR", {
               minimumFractionDigits: 0,
