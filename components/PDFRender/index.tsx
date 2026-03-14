@@ -267,6 +267,7 @@ export default function PDFRender({ url, file, onError }: PDFViewerProps) {
                 key={`PR${i}${salt}`}
                 pdf={pdf!}
                 onFinally={handleLoadPage}
+                scale={pdf.numPages <= 3 ? 4 : 1.5}
                 page={i + 1}
               />
             ))}
