@@ -8,16 +8,17 @@ import { PDFPage } from "./types";
 interface PDFViewerProps {
   pdf: PDFDocumentProxy;
   page: number;
+  scale?: number;
   onFinally?: (page: PDFPage) => void
 }
 
-export default function PDFFragment({ page, pdf, onFinally }: PDFViewerProps) {
+export default function PDFFragment({ page, pdf, scale = 4, onFinally }: PDFViewerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mutex = useRef(0);
 
   const loadPage = async (pdf: PDFDocumentProxy, pg: number) => {
     const page = await pdf.getPage(pg)
-    const viewport = page.getViewport({ scale: 4 });
+    const viewport = page.getViewport({ scale });
     const canvas = canvasRef.current;
     if (!canvas) return;
     const context = canvas.getContext("2d");
